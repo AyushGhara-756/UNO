@@ -1,3 +1,5 @@
+package org.th.Cards;
+
 public enum Color{
     RED("Red"), BLUE("Blue"), GREEN("Green"), YELLOW("Yellow"), WILD("Wild");
 
