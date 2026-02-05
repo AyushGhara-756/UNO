@@ -24,9 +24,9 @@ public class Deck {
             cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" ");
             System.out.println("\nEnter color of card you want to play: ");
 
-            String color_choice = sc.next();
+            String color_choice = sc.next().toLowerCase(); //Player gives the color of the card
             System.out.println("\nEnter the action on the card");
-            String action_choice = sc.next(); // Player's card input
+            String action_choice = sc.next(); // Player gives specifies action on the card 
 
             List<Card> matchedCards = cards
                     .stream()
