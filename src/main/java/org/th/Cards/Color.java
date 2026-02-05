@@ -1,7 +1,7 @@
 package org.th.Cards;
 
 public enum Color{
-    RED("Red"), BLUE("Blue"), GREEN("Green"), YELLOW("Yellow"), WILD("Wild");
+    RED("red"), BLUE("blue"), GREEN("green"), YELLOW("yellow"), WILD("wild");
 
     private String color;
     Color(String color){
@@ -9,6 +9,6 @@ public enum Color{
     }
     @Override
     public String toString(){
-         return color; 
+         return color.toUpperCase(); 
     }
 }
