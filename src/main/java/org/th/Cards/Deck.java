@@ -21,7 +21,7 @@ public class Deck {
     public void playCard() {
         while (true) {
             System.out.println("Your deck: ");
-            cards.forEach(card -> System.out.print(card.getAction() + " "));
+            cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" ");
             System.out.println("\nEnter which card you want to play: ");
 
             String choice = sc.next(); // Player's card input
