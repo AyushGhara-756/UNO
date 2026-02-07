@@ -1,6 +1,7 @@
-package org.th.Cards;
+package org.th.GameLogic;
 
 import lombok.Data;
+import org.th.Cards.Card;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 @Data
 public class Deck {
 
+    private Card lastcardplayed = null;
     private List<Card> cards = new ArrayList<>();
     Scanner sc = new Scanner(System.in);
 
@@ -18,31 +20,42 @@ public class Deck {
         }
     }
 
-    public void playCard() {
-        while (true) {
-            System.out.println("Your deck: ");
-            cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" ");
-            System.out.println("\nEnter color of card you want to play: ");
+    public void printDeck(){
+        System.out.println("Your deck: ");
+        cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" "));
+    }
 
-            String color_choice = sc.next().toLowerCase(); //Player gives the color of the card
-            System.out.println("\nEnter the action on the card");
-            String action_choice = sc.next(); // Player gives specifies action on the card 
-
-            List<Card> matchedCards = cards
-                    .stream()
-                    .filter(c ->
- c.getAction().toString().equals(action_choice) &&
-c.getColor().toString().equals(color_choice)) // filtered the matched cards out
-                    .toList();
+    public Card playCard(Card lastcardplayed, String color, String action) {
+        if (lastcardplayed.getColor().toString().equals(color) ||
+                lastcardplayed.getAction().toString().equals(action)
+        ){
+            List<Card> matchedCards = findCard(color, action);
 
             if (!matchedCards.isEmpty()) {
-                Card played = matchedCards.get(0); // get the first match
+                Card played = matchedCards.get(0); //get the first match
                 System.out.println("Card played: " + played.getColor()+ ": " + played.getAction());
                 cards.remove(played); // remove the played card from deck
-                break; // exit loop after successful play
-            } else {
-                System.out.println("Invalid card entered, try again.");
+                return played;
             }
         }
+
+        System.out.println("Invalid card entered, try again.");
+        return null;
+    }
+
+    public List<Card> findCard(String color, String action){
+        return cards
+                .stream()
+                .filter(c ->
+                        c.getAction().toString().equals(action) &&
+                                c.getColor().toString().equals(color)
+                ) // filtered the matched cards out
+                .toList();
+    }
+
+    public Card drawCard(){
+        Card card = new Card();
+        cards.addLast(card);
+        return card;
     }
 }
