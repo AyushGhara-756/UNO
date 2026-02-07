@@ -21,38 +21,38 @@ public class Deck {
     }
 
     public void printDeck(){
-        System.out.println("Your deck: ");
+        System.out.println("\nYour deck: ");
         cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" "));
     }
 
-    public Card playCard(Card lastcardplayed, String color, String action) {
-        if (lastcardplayed.getColor().toString().equals(color) ||
-                lastcardplayed.getAction().toString().equals(action)
+    public Card playCard(Card lastPlayedCard, Card inputCard) {
+        if (lastPlayedCard.getColor().equals(inputCard.getColor()) ||
+                lastPlayedCard.getAction().equals(inputCard.getAction())
         ){
-            List<Card> matchedCards = findCard(color, action);
+            List<Card> matchedCards = findCard(inputCard); // Search for the card in the deck
 
             if (!matchedCards.isEmpty()) {
-                Card played = matchedCards.get(0); //get the first match
+                Card played = matchedCards.getFirst(); // Gets the first match
                 System.out.println("Card played: " + played.getColor()+ ": " + played.getAction());
                 cards.remove(played); // remove the played card from deck
                 return played;
             }
         }
-
-        System.out.println("Invalid card entered, try again.");
         return null;
     }
 
-    public List<Card> findCard(String color, String action){
+    //Function to search for the card
+    public List<Card> findCard(Card inputCard){
         return cards
                 .stream()
                 .filter(c ->
-                        c.getAction().toString().equals(action) &&
-                                c.getColor().toString().equals(color)
+                        c.getAction().equals(inputCard.getAction()) &&
+                                c.getColor().equals(inputCard.getColor())
                 ) // filtered the matched cards out
                 .toList();
     }
 
+    // Function to draw a new card.
     public Card drawCard(){
         Card card = new Card();
         cards.addLast(card);

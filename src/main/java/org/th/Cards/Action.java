@@ -6,8 +6,17 @@ public enum Action {
 
     private final String value;
 
-    private Action(String value) {
+    Action(String value) {
         this.value = value;
+    }
+
+    public static Action fromAction(String value) {
+        for (Action a : Action.values()) {
+            if (a.value.equals(value)) {
+                return a;
+            }
+        }
+        return null;
     }
 
     @Override
