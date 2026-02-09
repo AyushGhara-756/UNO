@@ -22,7 +22,7 @@ public class Deck {
 
     public void printDeck(){
         System.out.println("\nYour deck: ");
-        cards.forEach(card -> System.out.print(card.getColor() + ":"+card.getAction()+" "));
+        cards.forEach(card -> System.out.print(card+" "));
     }
 
     public Card playCard(Card lastPlayedCard, Card inputCard) {
