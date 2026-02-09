@@ -29,4 +29,9 @@ public class Card{
         System.out.print(color + ": " + action);
     }
 
+    @Override
+    public String toString(){
+        return color + ": " + action;
+    }
+
 }
