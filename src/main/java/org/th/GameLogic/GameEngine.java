@@ -26,13 +26,7 @@ public class GameEngine {
         System.out.println("Starting card: ");
         lastplayedCard.printCard();
 
-        while (true) {
-            playerTurn();
-            if (isGameOver()) break;
-
-            computerTurn();
-            if (isGameOver()) break;
-        }
+        // rewrite the logic
 
         System.out.println(playerDeck.getCards().isEmpty() ?
                 "Congratulations! You won." : "Oops! You lost.");
@@ -69,8 +63,7 @@ public class GameEngine {
 
         if (color.equals("draw")) {
             Card card = new Card();
-            System.out.println("Card drew: ");
-            card.printCard();
+            System.out.println("Card drew: "+card);
             System.out.println("\nWant to play it? [y/n]: ");
             String wantToPlay = sc.next().toLowerCase();
 
@@ -119,20 +112,17 @@ public class GameEngine {
 
             if (card.getColor().equals(lastplayedCard.getColor()) ||
                     card.getAction().equals(lastplayedCard.getAction())) {
-                Card playedCard = computerDeck.playCard(lastplayedCard, card);
-                if (playedCard != null) {
-                    lastplayedCard = playedCard;
-                }
-                else {
-                    System.out.println("He doesn't has a card to play");
-                }
+                System.out.println("Computer played: "+card);
+                lastplayedCard = card;
+            }
+            else {
+                System.out.println("He doesn't has a card to play");
             }
         } else {
             for (Card card : matchedCards) {
                 if (card.getColor().equals(lastplayedCard.getColor()) ||
                         card.getAction().equals(lastplayedCard.getAction())) {
-                    System.out.println("Computer played: ");
-                    card.printCard();
+                    System.out.println("Computer played: "+card);
                     computerDeck.getCards().remove(card);
                     lastplayedCard = card;
                     break;

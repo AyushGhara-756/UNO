@@ -2,8 +2,6 @@ package org.th.Cards;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 @Data
@@ -32,18 +30,6 @@ public class Card{
     @Override
     public String toString(){
         return color + ": " + action;
-    }
-
-    public String play(){
-        if (action === Action.SKIP){
-             return "play again";
-        }
-        else if (action === Action.REVERSE){
-             return "play again";
-        }
-        else{
-             return toString();
-        }
     }
 
 }
