@@ -34,4 +34,16 @@ public class Card{
         return color + ": " + action;
     }
 
+    public String play(){
+        if (action === Action.SKIP){
+             return "play again";
+        }
+        else if (action === Action.REVERSE){
+             return "play again";
+        }
+        else{
+             return toString();
+        }
+    }
+
 }
