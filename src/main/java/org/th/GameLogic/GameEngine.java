@@ -107,7 +107,7 @@ public class GameEngine {
                 .toList();
 
         if (matchedCards.isEmpty()){
-            Card card = computerDeck.drawCard();
+            Card card = new Card();
             System.out.println("Computer drew a card.");
 
             if (card.getColor().equals(lastplayedCard.getColor()) ||
