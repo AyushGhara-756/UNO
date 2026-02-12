@@ -10,9 +10,7 @@ import java.util.Scanner;
 @Data
 public class Deck {
 
-    private Card lastcardplayed = null;
     private List<Card> cards = new ArrayList<>();
-    Scanner sc = new Scanner(System.in);
 
     public Deck(){
         for (int i = 0; i<7; i++){
