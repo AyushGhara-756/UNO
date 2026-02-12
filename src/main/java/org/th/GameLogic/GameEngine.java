@@ -12,6 +12,10 @@ public class GameEngine {
     private Deck computerDeck = null;
     private Card lastplayedCard = null;
     private static final Scanner sc = new Scanner(System.in);
+    private static Deque<String> sequence = new ArrayDeque<>();
+
+sequence.offer("Player");
+sequence.offer("Computer");
 
     public void start(){
         System.out.println("Game started");
