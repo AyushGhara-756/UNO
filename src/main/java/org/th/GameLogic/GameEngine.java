@@ -1,18 +1,18 @@
 package org.th.GameLogic;
 
+import org.th.Cards.Action;
 import org.th.Cards.Card;
-import org.th.Cards.Color;
 
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class GameEngine {
 
     private Deck playerDeck = null;
     private Deck computerDeck = null;
     private Card lastplayedCard = null;
-    private static final Scanner sc = new Scanner(System.in);
-    private static Deque<String> sequence = new ArrayDeque<>();
+    static final Scanner sc = new Scanner(System.in);
+    private static final Deque<String> sequence = new ArrayDeque<>();
+    String turn = "";
 
     public void start(){
         System.out.println("Game started");
@@ -20,8 +20,11 @@ public class GameEngine {
         playerDeck = new Deck();
         computerDeck = new Deck();
         lastplayedCard = new Card();
+
+        sequence.clear();
         sequence.offer("Player");
         sequence.offer("Computer");
+
         game();
     }
 
@@ -29,7 +32,23 @@ public class GameEngine {
         System.out.println("Starting card: ");
         lastplayedCard.printCard();
 
-        // rewrite the logic
+        while(!isGameOver()){
+            turn = sequence.poll(); //get the turn from sequence
+
+            if(!lastplayedCard.getAction().equals(Action.SKIP)){  //check if the card is not skip
+                if (turn!= null && turn.equals("Player")) playerTurn();
+                else computerTurn(); // check whose turn it is
+            }
+
+            sequence.offer(turn);  // put the turn back to sequence
+
+            if(lastplayedCard.getAction().equals(Action.REVERSE)){ // checks if the card played is reverse
+                List<String> seq = new ArrayList<>(sequence); // creates a list out of sequence
+                Collections.reverse(seq); // reverse the list
+                sequence.clear(); // clear the sequence before adding something
+                sequence.addAll(seq); // add the new sequence
+            }
+        }
 
         System.out.println(playerDeck.getCards().isEmpty() ?
                 "Congratulations! You won." : "Oops! You lost.");
@@ -42,7 +61,6 @@ public class GameEngine {
 
     public boolean playAgain(){
         System.out.print("Play again ? [y/n]: ");
-        sc.nextLine();
         String play = sc.nextLine().toLowerCase().trim();
         if (play.equals("n"))
             return stop();
@@ -71,6 +89,7 @@ public class GameEngine {
             String wantToPlay = sc.next().toLowerCase();
 
             if (wantToPlay.equals("y")) {
+                playerDeck.getCards().addLast(card);
                 return card;
             } else if (wantToPlay.equals("n")) {
                 playerDeck.getCards().addLast(card);
