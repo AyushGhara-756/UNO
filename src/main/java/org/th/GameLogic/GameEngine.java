@@ -14,15 +14,14 @@ public class GameEngine {
     private static final Scanner sc = new Scanner(System.in);
     private static Deque<String> sequence = new ArrayDeque<>();
 
-sequence.offer("Player");
-sequence.offer("Computer");
-
     public void start(){
         System.out.println("Game started");
         System.out.println("Welcome to UNO");
         playerDeck = new Deck();
         computerDeck = new Deck();
         lastplayedCard = new Card();
+        sequence.offer("Player");
+        sequence.offer("Computer");
         game();
     }
 
