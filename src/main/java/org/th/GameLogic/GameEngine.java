@@ -29,24 +29,24 @@ public class GameEngine {
     }
 
     public boolean game(){
-        System.out.println("Starting card: ");
-        lastplayedCard.printCard();
+        System.out.println("Starting card: "+lastplayedCard);
 
         while(!isGameOver()){
-            turn = sequence.poll(); //get the turn from sequence
+            turn = sequence.poll();                                 // get the turn from sequence
 
-            if(!lastplayedCard.getAction().equals(Action.SKIP)){  //check if the card is not skip
+            System.out.println("Last card played: "+lastplayedCard);// Print what the last card played
+            if(!lastplayedCard.getAction().equals(Action.SKIP)){    //check if the card is not skip
                 if (turn!= null && turn.equals("Player")) playerTurn();
-                else computerTurn(); // check whose turn it is
+                else computerTurn();                                // check whose turn it is
             }
 
-            sequence.offer(turn);  // put the turn back to sequence
+            sequence.offer(turn);                                   // put the turn back to sequence
 
-            if(lastplayedCard.getAction().equals(Action.REVERSE)){ // checks if the card played is reverse
-                List<String> seq = new ArrayList<>(sequence); // creates a list out of sequence
-                Collections.reverse(seq); // reverse the list
-                sequence.clear(); // clear the sequence before adding something
-                sequence.addAll(seq); // add the new sequence
+            if(lastplayedCard.getAction().equals(Action.REVERSE)){  // checks if the card played is reverse
+                List<String> seq = new ArrayList<>(sequence);       // creates a list out of sequence
+                Collections.reverse(seq);                           // reverse the list
+                sequence.clear();                                   // clear the sequence before adding something
+                sequence.addAll(seq);                               // add the new sequence
             }
         }
 

@@ -2,6 +2,7 @@ package org.th.Cards;
 
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.Random;
 
 @Data
@@ -9,22 +10,24 @@ public class Card{
 
     private Action action;
     private Color color;
-    private static Color[] colors = Color.values();
-    private static Action[] actions = Action.values();
-    private Random rand = new Random();
+    static Color[] colors = Color.values();
+    //static Action[] actions = Action.values();
+    static Action[] numbers = Arrays
+            .stream(Action.values())
+            .filter(card -> (card != Action.REVERSE) && (card != Action.SKIP))
+            .toArray(Action[]::new);
+    static Action[] actions = new Action[]{Action.REVERSE, Action.SKIP};
+    Random rand = new Random();
 
     public Card() {
-        action = actions[rand.nextInt(actions.length)];
         color = colors[rand.nextInt(colors.length)];
+        if (color.equals(Color.WILD)) action = actions[rand.nextInt(actions.length)];
+        else action = numbers[rand.nextInt(numbers.length)];
     }
 
     public Card(String action, String color) {
         this.action = Action.fromAction(action);
         this.color = Color.fromValue(color);
-    }
-
-    public void printCard(){
-        System.out.print(color + ": " + action);
     }
 
     @Override
