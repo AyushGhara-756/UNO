@@ -5,76 +5,111 @@ import org.th.Cards.Card;
 
 import java.util.*;
 
-public class GameEngine {
+public class GameEngine extends Thread {
 
     private Deck playerDeck = null;
     private Deck computerDeck = null;
     private Card lastplayedCard = null;
+    private Card secondLastPlayedCard = null;
     static final Scanner sc = new Scanner(System.in);
     private static final Deque<String> sequence = new ArrayDeque<>();
     String turn = "";
+    private volatile boolean running = true;
 
-    public void start(){
-        System.out.println("Game started");
-        System.out.println("Welcome to UNO");
-        playerDeck = new Deck();
-        computerDeck = new Deck();
-        lastplayedCard = new Card();
-
-        sequence.clear();
-        sequence.offer("Player");
-        sequence.offer("Computer");
-
-        game();
+    public void swap(Card playedCard) {
+        secondLastPlayedCard = lastplayedCard;
+        lastplayedCard = playedCard;
     }
 
-    public boolean game(){
+    public void initialize(){
+
+        try {
+            showLoadingAnimation("Starting game engine",2000);
+            System.out.println("Welcome to UNO!!!");
+            playerDeck = new Deck();
+            showLoadingAnimation("Generating Player Deck",2000);
+            computerDeck = new Deck();
+            showLoadingAnimation("Generating Computer Deck",2000);
+            lastplayedCard = new Card();
+
+            sequence.clear();
+            sequence.offer("Player");
+            sequence.offer("Computer");
+
+            running = true;
+        }
+        catch (Exception e){
+            System.err.println("Error occurred: " + e.getMessage());
+        }
+
+    }
+
+    /* Write the draw logic and starting card restrictions */
+
+    @SuppressWarnings("BusyWait")
+    @Override
+    public void run(){
+        initialize();
         System.out.println("Starting card: "+lastplayedCard);
 
-        while(!isGameOver()){
-            turn = sequence.poll();                                 // get the turn from sequence
+        while(!isGameOver() && running){
+            try {
+                Thread.sleep(1000);
+                turn = sequence.poll();                                 // get the turn from sequence
 
-            System.out.println("Last card played: "+lastplayedCard);// Print what the last card played
-            if(!lastplayedCard.getAction().equals(Action.SKIP)){    //check if the card is not skip
-                if (turn!= null && turn.equals("Player")) playerTurn();
-                else computerTurn();                                // check whose turn it is
-            }
+                System.out.println("\nLast card played: " + ((lastplayedCard!=null)?lastplayedCard:secondLastPlayedCard));// Print what the last card played
+                if (lastplayedCard != null && lastplayedCard.getAction().equals(Action.SKIP)) {
+                    sequence.offer(turn);
+                    turn = sequence.poll();
+                    if (turn != null && turn.equals("Player")) playerTurn();
+                    else computerTurn();
+                } else {
+                    if (turn != null && turn.equals("Player")) playerTurn();
+                    else computerTurn();
+                }
 
-            sequence.offer(turn);                                   // put the turn back to sequence
-
-            if(lastplayedCard.getAction().equals(Action.REVERSE)){  // checks if the card played is reverse
-                List<String> seq = new ArrayList<>(sequence);       // creates a list out of sequence
-                Collections.reverse(seq);                           // reverse the list
-                sequence.clear();                                   // clear the sequence before adding something
-                sequence.addAll(seq);                               // add the new sequence
+                if (lastplayedCard.getAction().equals(Action.REVERSE)) {  // checks if the card played is reverse
+                    List<String> seq = new ArrayList<>(sequence);       // creates a list out of sequence
+                    Collections.reverse(seq);                           // reverse the list
+                    sequence.clear();                                   // clear the sequence before adding something
+                    sequence.add(turn);                                 // add current turn first
+                    sequence.addAll(seq);                               // then add the reversed sequence
+                } else {
+                    sequence.offer(turn);                               // put the turn back to sequence normally
+                }
+            }catch (InterruptedException e){
+                running = false;
+                System.out.println("Error occurred: "+e.getMessage());
             }
         }
 
         System.out.println(playerDeck.getCards().isEmpty() ?
                 "Congratulations! You won." : "Oops! You lost.");
-        return playAgain();
+        playAgain();
     }
 
     private boolean isGameOver() {
         return playerDeck.getCards().isEmpty() || computerDeck.getCards().isEmpty();
     }
 
-    public boolean playAgain(){
+    public void playAgain(){
+
         System.out.print("Play again ? [y/n]: ");
         String play = sc.nextLine().toLowerCase().trim();
-        if (play.equals("n"))
-            return stop();
-        else if (play.equals("y"))
-            return game();
+
+        if (play.equals("n")) exit();
+        else if (play.equals("y")) initialize();
         else {
             System.out.println("Invalid input, try again");
-            return playAgain();
+            playAgain();
         }
+
     }
 
-    public boolean stop(){
+    public void exit(){
         System.out.println("Game stopped. \nThank you for playing.");
-        return false;
+        currentThread().interrupt();
+        running = false;
     }
 
     public Card inputCard(){
@@ -118,7 +153,7 @@ public class GameEngine {
             playerTurn();
             return;
         }
-        lastplayedCard = playedCard;
+        swap(playedCard);
     }
 
     public void computerTurn(){
@@ -135,10 +170,11 @@ public class GameEngine {
             if (card.getColor().equals(lastplayedCard.getColor()) ||
                     card.getAction().equals(lastplayedCard.getAction())) {
                 System.out.println("Computer played: "+card);
-                lastplayedCard = card;
+                swap(card);
             }
             else {
                 System.out.println("He doesn't has a card to play");
+                computerDeck.getCards().addLast(card);
             }
         } else {
             for (Card card : matchedCards) {
@@ -146,10 +182,28 @@ public class GameEngine {
                         card.getAction().equals(lastplayedCard.getAction())) {
                     System.out.println("Computer played: "+card);
                     computerDeck.getCards().remove(card);
-                    lastplayedCard = card;
+                    swap(card);
                     break;
                 }
             }
+        }
+    }
+    private void showLoadingAnimation(String message, int durationMs) {
+        int barLength = 20;
+        long startTime = System.currentTimeMillis();
+
+        try {
+            while (System.currentTimeMillis() - startTime < durationMs) {
+                long elapsed = System.currentTimeMillis() - startTime;
+                int progress = (int) ((elapsed * barLength) / durationMs);
+
+                String bar = "=".repeat(progress) + " ".repeat(barLength - progress);
+                System.out.print("\r" + message + " [" + bar + "]");
+                Thread.sleep(100);
+            }
+            System.out.println("\r" + message + " [" + "=".repeat(barLength) + "] Done!");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }
