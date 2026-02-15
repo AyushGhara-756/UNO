@@ -2,6 +2,7 @@ package org.th.GameLogic;
 
 import org.th.Cards.Action;
 import org.th.Cards.Card;
+import org.th.Engine.Turn;
 
 import java.util.*;
 
@@ -15,6 +16,7 @@ public class GameEngine extends Thread {
     private static final Deque<String> sequence = new ArrayDeque<>();
     String turn = "";
     private volatile boolean running = true;
+    Turn t = new Turn();
 
     public void swap(Card playedCard) {
         secondLastPlayedCard = lastplayedCard;
@@ -57,7 +59,8 @@ public class GameEngine extends Thread {
                 Thread.sleep(1000);
                 turn = sequence.poll();                                 // get the turn from sequence
 
-                System.out.println("\nLast card played: " + ((lastplayedCard!=null)?lastplayedCard:secondLastPlayedCard));// Print what the last card played
+                System.out.println("\nLast card played: " + (
+                        (lastplayedCard!=null)?lastplayedCard:secondLastPlayedCard));// Print what the last card played
                 if (lastplayedCard != null && lastplayedCard.getAction().equals(Action.SKIP)) {
                     sequence.offer(turn);
                     turn = sequence.poll();
@@ -205,5 +208,12 @@ public class GameEngine extends Thread {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private Card play(String turn){
+        Card playedCard;
+        if (turn != null && turn.equals("Player")) playedCard =  t.playerTurn(inputCard(),lastplayedCard);
+        else playedCard = t.computerTurn(lastplayedCard);
+        return (playedCard!=null) ?  playedCard : play(turn);
     }
 }
