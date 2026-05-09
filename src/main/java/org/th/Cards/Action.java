@@ -12,17 +12,19 @@ public enum Action {
         this.value = value;
     }
 
-    public static Action fromAction(String value) {
-        for (Action a : Action.values()) {
-            if (a.value.equals(value)) {
-                return a;
-            }
-        }
-        return null;
-    }
 
     @Override
     public String toString() {
         return value;
     }
+
+//    public static Action fromAction(String value) {
+//        for (Action a : Action.values()) {
+//            if (a.value.equals(value)) {
+//                return a;
+//            }
+//        }
+//        return null;
+//    }
+
 }

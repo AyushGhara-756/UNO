@@ -2,7 +2,6 @@ package org.th.GameLogic;
 
 import org.th.Cards.Action;
 import org.th.Cards.Card;
-import org.th.Engine.Turn;
 
 import java.util.*;
 
@@ -16,7 +15,7 @@ public class GameEngine extends Thread {
     private static final Deque<String> sequence = new ArrayDeque<>();
     String turn = "";
     private volatile boolean running = true;
-    Turn t = new Turn();
+    //Turn t = new Turn();
 
     public void swap(Card playedCard) {
         secondLastPlayedCard = lastplayedCard;
@@ -116,7 +115,7 @@ public class GameEngine extends Thread {
     }
 
     public Card inputCard(){
-        playerDeck.printDeck();
+        //playerDeck.printDeck();
         System.out.println("\nEnter color of card you want to play or type 'draw': ");
         String color = sc.next().toLowerCase();
 
@@ -150,7 +149,7 @@ public class GameEngine extends Thread {
             return; // Skip turn if null
         }
 
-        Card playedCard = playerDeck.playCard(lastplayedCard, play);
+        Card playedCard = null;
         if (playedCard == null){
             System.out.println("Invalid card entered, try again.");
             playerTurn();
@@ -210,10 +209,10 @@ public class GameEngine extends Thread {
         }
     }
 
-    private Card play(String turn){
-        Card playedCard;
-        if (turn != null && turn.equals("Player")) playedCard =  t.playerTurn(inputCard(),lastplayedCard);
-        else playedCard = t.computerTurn(lastplayedCard);
-        return (playedCard!=null) ?  playedCard : play(turn);
-    }
+//    private Card play(String turn){
+//        Card playedCard;
+//        if (turn != null && turn.equals("Player")) playedCard =  t.playerTurn(inputCard(),lastplayedCard);
+//        else playedCard = t.computerTurn(lastplayedCard);
+//        return (playedCard!=null) ?  playedCard : play(turn);
+//    }
 }

@@ -1,59 +1,48 @@
 package org.th.GameLogic;
 
 import lombok.Data;
+import org.th.Cards.Action;
 import org.th.Cards.Card;
+import org.th.Cards.Color;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 @Data
 public class Deck {
 
     private List<Card> cards = new ArrayList<>();
 
-    public Deck(){
-        for (int i = 0; i<7; i++){
-            cards.addLast(new Card());
-        }
-    }
+    public void generateDeck() {
 
-    public void printDeck(){
-        System.out.println("\nYour deck: ");
-        cards.forEach(card -> System.out.print(card+" "));
-    }
+        Color[] normalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
 
-    public Card playCard(Card lastPlayedCard, Card inputCard) {
-        if (lastPlayedCard.getColor().equals(inputCard.getColor()) ||
-                lastPlayedCard.getAction().equals(inputCard.getAction())
-        ){
-            List<Card> matchedCards = findCard(inputCard); // Search for the card in the deck
-
-            if (!matchedCards.isEmpty()) {
-                Card played = matchedCards.getFirst(); // Gets the first match
-                System.out.println("Card played: " + played.getColor()+ ": " + played.getAction());
-                cards.remove(played); // remove the played card from deck
-                return played;
+        for (Color color : normalColors) {
+            // ZERO through NINE, SKIP, REVERSE, DRAW2 — two copies each per color
+            Action[] twice = {
+                    Action.ZERO, Action.ONE, Action.TWO,
+                    Action.THREE, Action.FOUR, Action.FIVE,
+                    Action.SIX, Action.SEVEN, Action.EIGHT,
+                    Action.NINE, Action.SKIP, Action.REVERSE, Action.DRAW2
+            };
+            for (Action action : twice) {
+                cards.add(new Card(action, color));
+                cards.add(new Card(action, color));
             }
         }
-        return null;
+        // WILD cards — 4 of each, color is WILD
+        for (int i = 0; i < 4; i++) {
+            cards.add(new Card(Action.CHANGE, Color.WILD));
+            cards.add(new Card(Action.CHANGE4, Color.WILD));
+        }
+        Collections.shuffle(cards);
     }
 
-    //Function to search for the card
-    public List<Card> findCard(Card inputCard){
-        return cards
-                .stream()
-                .filter(c ->
-                        c.getAction().equals(inputCard.getAction()) &&
-                                c.getColor().equals(inputCard.getColor())
-                ) // filtered the matched cards out
-                .toList();
-    }
-
-    // Function to draw a new card.
     public Card drawCard(){
-        Card card = new Card();
-        cards.addLast(card);
-        return card;
+        return cards.removeFirst();
     }
+
+    public void addCard(Card played){
+        cards.addLast(played);
+    }
+
 }
