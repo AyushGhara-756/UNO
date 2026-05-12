@@ -21,7 +21,10 @@ public class Card{
         this.color = color;
     }
 
-    public boolean isPlayable(Card topCard){
-        return (topCard.getColor().equals(color) || topCard.getAction().equals(action));
+    public boolean isPlayable(Card topCard) {
+        if (this.color == Color.WILD) return true;                        // wilds always playable
+        if (this.color == topCard.getColor()) return true;                // same color
+        if (this.action == topCard.getAction()) return true;              // same action/number
+        return false;
     }
 }
