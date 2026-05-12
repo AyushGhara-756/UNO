@@ -6,7 +6,9 @@ import org.th.Cards.Card;
 import org.th.Cards.Color;
 import org.th.Player.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Data
 public class Deck {

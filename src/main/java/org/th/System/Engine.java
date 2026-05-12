@@ -3,7 +3,8 @@ package org.th.System;
 import org.th.Cards.Card;
 import org.th.Player.Player;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 public class Engine {
 
@@ -21,7 +22,7 @@ public class Engine {
             showLoadingAnimation("Generating Deck", 2000);
             mainDeck.generateDeck();
             showLoadingAnimation("Distributing cards", 2000);
-            players = List.of(new Player("Ayush","user"),new Player("Computer","computer"));
+            players = List.of(new Player("Ayush", "user"), new Player("Computer", "computer"));
             mainDeck.distribute(players);
             running = true;
             run();

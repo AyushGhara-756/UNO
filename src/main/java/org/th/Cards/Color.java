@@ -5,7 +5,7 @@ public enum Color {
 
     private final String color;
 
-    Color(String color){
+    Color(String color) {
         this.color = color;
     }
 
@@ -19,7 +19,7 @@ public enum Color {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return color.toUpperCase();
     }
 }
