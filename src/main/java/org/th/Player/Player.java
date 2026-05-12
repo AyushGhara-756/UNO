@@ -30,14 +30,18 @@ public class Player {
      * Returns the card played, or null if the player drew and couldn't play.
      * Engine checks for null to know if turn was passed.
      */
-    public Card playTurn(Card topCard, Deck mainDeck, Deck stashDeck) {
+    public Card playTurn(Card topCard, Deck mainDeck, Deck stashDeck, boolean pendingStack) {
         System.out.println("\n>> " + name + "'s turn");
         System.out.println("Top card: " + topCard);
+        hand = hand.stream()
+                .sorted(Comparator.comparing((Card card) -> card.getColor().ordinal())
+                        .thenComparing(card -> card.getAction().ordinal()))
+                .collect(Collectors.toCollection(ArrayList::new));
 
         if (type.equalsIgnoreCase("computer")) {
-            return computerTurn(topCard, mainDeck, stashDeck);
+            return computerTurn(topCard, mainDeck, stashDeck, pendingStack);
         } else {
-            return playerTurn(topCard, mainDeck, stashDeck);
+            return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
         }
     }
 
@@ -45,12 +49,37 @@ public class Player {
     // USER TURN
     // ─────────────────────────────────────────────
 
-    private Card playerTurn(Card topCard, Deck mainDeck, Deck stashDeck) {
+    private Card playerTurn(Card topCard, Deck mainDeck, Deck stashDeck, boolean pendingStack) {
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\nYour Cards:");
         for (int i = 0; i < hand.size(); i++) {
             System.out.print("[" + (i + 1) + "]" + hand.get(i) + "  ");
+        }
+
+        if (pendingStack) {
+            System.out.println("Enter the position of stackable card\nOR enter [d] to draw");
+            String choice = sc.nextLine().trim().toLowerCase();
+            if (choice.equals("d")) {
+                System.out.println(name + " choose to draw cards");
+                return null;
+            }
+            int cardNum = Integer.parseInt(choice) - 1;
+            if (cardNum < 0 || cardNum >= hand.size()) {
+                System.out.println("Invalid position. Try again.");
+                return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
+            }
+
+            Card played = hand.remove(cardNum);
+            if (!played.isStackable(topCard)) {
+                System.out.println("Card is not stackable. Try again.");
+                return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
+            }
+            hand.remove(cardNum);
+            handleWildColor(played, sc);
+            stashDeck.addCard(played);
+            System.out.println("You played: " + played);
+            return played;
         }
 
         System.out.println("\nEnter [d] to Draw card OR position of card to play:");
@@ -88,14 +117,14 @@ public class Player {
 
                 if (cardNum < 0 || cardNum >= hand.size()) {
                     System.out.println("Invalid position. Try again.");
-                    return playerTurn(topCard, mainDeck, stashDeck);
+                    return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
                 }
 
                 Card played = hand.get(cardNum);
 
                 if (!played.isPlayable(topCard)) {
                     System.out.println("Card is not playable. Try again.");
-                    return playerTurn(topCard, mainDeck, stashDeck);
+                    return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
                 }
 
                 handleWildColor(played, sc);
@@ -106,7 +135,7 @@ public class Player {
 
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Try again.");
-                return playerTurn(topCard, mainDeck, stashDeck);
+                return playerTurn(topCard, mainDeck, stashDeck, pendingStack);
             }
         }
     }
@@ -115,12 +144,29 @@ public class Player {
     // COMPUTER TURN
     // ─────────────────────────────────────────────
 
-    private Card computerTurn(Card topCard, Deck mainDeck, Deck stashDeck) {
+    private Card computerTurn(Card topCard, Deck mainDeck, Deck stashDeck, boolean pendingStack) {
         List<Card> playable = hand.stream()
                 .filter(card -> card.isPlayable(topCard))
                 .sorted(Comparator.comparing((Card card) -> card.getColor().ordinal())
                         .thenComparing(card -> card.getAction().ordinal()))
                 .toList();
+
+        if (pendingStack){
+            playable = playable.stream()
+                    .filter(card -> card.isStackable(topCard))
+                    .sorted(Comparator.comparing((Card card) -> card.getColor().ordinal())
+                            .thenComparing(card -> card.getAction().ordinal()))
+                    .toList();
+
+            if (playable.isEmpty()){
+                return null; // Had to draw cards
+            }
+            Card played = playable.removeFirst();
+            hand.remove(played);
+            stashDeck.addCard(played);
+            System.out.println(name + " played: " + played);
+            return played;
+        }
 
         if (playable.isEmpty()) {
             System.out.println(name + " drew a card.");
@@ -201,5 +247,13 @@ public class Player {
 
     public boolean hasWon() {
         return hand.isEmpty();
+    }
+
+    public boolean canStack(Card played) {
+        return hand.stream().anyMatch(c -> c.isStackable(played));
+    }
+
+    public boolean isUNO(){
+        return hand.size() ==1;
     }
 }

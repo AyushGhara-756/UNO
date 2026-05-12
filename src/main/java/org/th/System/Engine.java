@@ -11,17 +11,19 @@ public class Engine {
     public Deck mainDeck = new Deck();
     public Deck stashDeck = new Deck();
     public List<Player> players;
-    public int currentIndex = 0;
-    public int direction = 1;
-    public boolean running = false;
+    private int currentIndex = 0;
+    private int direction = 1;
+    private boolean running = false;
+    private int stackCount = 0;
+    private boolean pendingStack = false;
 
     public void start() {
         try {
-            showLoadingAnimation("Starting game engine", 2000);
+            showLoadingAnimation("Starting game engine", 1500);
             System.out.println("Welcome to UNO!!!");
-            showLoadingAnimation("Generating Deck", 2000);
+            showLoadingAnimation("Generating Deck", 1500);
             mainDeck.generateDeck();
-            showLoadingAnimation("Distributing cards", 2000);
+            showLoadingAnimation("Distributing cards", 1500);
             players = List.of(new Player("Ayush", "user"), new Player("Computer", "computer"));
             mainDeck.distribute(players);
             running = true;
@@ -31,7 +33,7 @@ public class Engine {
         }
     }
 
-    public void run() {
+    public void run() throws InterruptedException {
         currentIndex = new Random().nextInt(players.size());
 
         // First card on stash — skip wilds as starting card
@@ -39,14 +41,15 @@ public class Engine {
         do {
             topCard = mainDeck.drawCard();
         } while (topCard.getColor().name().equals("WILD"));
-        mainDeck.addCard(topCard);
+        stashDeck.addCard(topCard);
         System.out.println("\nStarting card: " + topCard);
+        Thread.sleep(1000);
 
         while (running) {
             System.out.println("\n========================================");
             Player current = players.get(currentIndex);
 
-            Card played = current.playTurn(topCard, mainDeck, stashDeck);
+            Card played = current.playTurn(topCard, mainDeck, stashDeck,pendingStack);
 
             // null means turn was passed — topCard stays the same
             if (played != null) {
@@ -55,9 +58,13 @@ public class Engine {
 
             // Win check
             if (current.hasWon()) {
-                System.out.println("\n>> " + current.getName() + " WINS! GG!");
+                System.out.println("\n\n🥳🥳🥳🥳🥳🥳🥳🥳>> " + current.getName().toUpperCase() + " WINS! \n🥳🥳🥳🥳🥳🥳🥳🥳");
                 running = false;
                 break;
+            }
+
+            if (current.isUNO()){
+                System.out.println(current.getName() + ": UNO!!!");
             }
 
             applyEffect(played);
@@ -81,8 +88,18 @@ public class Engine {
     // ─────────────────────────────────────────────
 
     private void applyEffect(Card played) {
-        if (played == null) {
+        if (played == null && !pendingStack) {
             advanceTurn(1); // turn passed, move on normally
+            return;
+        }
+
+        if (played == null && pendingStack) {
+            Player current = players.get(currentIndex);
+            System.out.println(current.getName() + " draws " + stackCount + " cards.");
+            current.drawCards(stackCount, mainDeck);
+            stackCount = 0;
+            pendingStack = false;
+            advanceTurn(1); // their turn ends, move to next
             return;
         }
 
@@ -102,23 +119,52 @@ public class Engine {
                 }
             }
             case DRAW2 -> {
+                stackCount += 2;
                 Player target = players.get(nextIndex(1));
-                System.out.println(">> +2! " + target.getName() + " draws 2 and is skipped.");
-                target.drawCards(2, mainDeck);
+                System.out.println(">> " + played + "! has been played");
+                if (target.canStack(played)) {
+                    System.out.println(">> " + target.getName() + " can stack.");
+                    pendingStack = true;
+                    advanceTurn(1);
+                    return;
+                }
+                System.out.println(">> +2! " + target.getName() + " draws " + stackCount + " and is skipped.");
+                target.drawCards(stackCount, mainDeck);
+                stackCount = 0;
+                pendingStack = false; // ✅
                 advanceTurn(2);
             }
             case DRAW4 -> {
+                stackCount += 4;
                 Player target = players.get(nextIndex(1));
-                System.out.println(">> +4! " + target.getName() + " draws 4 and is skipped.");
-                target.drawCards(4, mainDeck);
+                System.out.println(">> " + played + "! has been played");
+                if (target.canStack(played)) {
+                    System.out.println(">> " + target.getName() + " can stack.");
+                    pendingStack = true;
+                    advanceTurn(1);
+                    return;
+                }
+                System.out.println(">> +4! " + target.getName() + " draws " + stackCount + " and is skipped.");
+                target.drawCards(stackCount, mainDeck);
+                stackCount = 0;
+                pendingStack = false; // ✅
                 advanceTurn(2);
             }
             case CHANGE4 -> {
+                stackCount += 4;
                 Player target = players.get(nextIndex(1));
-                System.out.println(">> +4! " + target.getName() + " draws 4 and is skipped.");
-                target.drawCards(4, mainDeck);
+                System.out.println(">> " + played + "! has been played");
+                if (target.canStack(played)) {
+                    System.out.println(">> " + target.getName() + " can stack.");
+                    pendingStack = true;
+                    advanceTurn(1);
+                    return;
+                }
+                System.out.println(">> +4! " + target.getName() + " draws " + stackCount + " and is skipped.");
+                target.drawCards(stackCount, mainDeck);
+                stackCount = 0;
+                pendingStack = false; // ✅
                 advanceTurn(2);
-                // color change already handled in playerTurn/computerTurn via handleWildColor
             }
             default -> advanceTurn(1);
         }
