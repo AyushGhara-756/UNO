@@ -2,31 +2,26 @@ package org.th.Cards;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 @Data
-public class Card{
+public class Card {
 
     private Action action;
     private Color color;
-    private static Color[] colors = Color.values();
-    private static Action[] actions = Action.values();
-    private Random rand = new Random();
 
-    public Card() {
-        action = actions[rand.nextInt(actions.length)];
-        color = colors[rand.nextInt(colors.length)];
+    public Card(Action action, Color color) {
+        this.action = action;
+        this.color = color;
     }
 
-    public Card(String action, String color) {
-        this.action = Action.fromAction(action);
-        this.color = Color.fromValue(color);
+    @Override
+    public String toString() {
+        return color + ":" + action;
     }
 
-    public void printCard(){
-        System.out.print(color + ": " + action);
+    public boolean isPlayable(Card topCard) {
+        if (this.color == Color.WILD) return true;                        // wilds always playable
+        if (this.color == topCard.getColor()) return true;                // same color
+        if (this.action == topCard.getAction()) return true;              // same action/number
+        return false;
     }
-
 }
