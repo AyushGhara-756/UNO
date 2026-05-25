@@ -19,7 +19,7 @@ public class Deck {
         Color[] normalColors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW};
 
         for (Color color : normalColors) {
-            // ZERO — only one per color in real UNO
+            // ZERO — only one per color as real UNO
             cards.add(new Card(Action.ZERO, color));
 
             // ONE through DRAW2 — two copies each per color
