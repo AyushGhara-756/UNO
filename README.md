@@ -1,17 +1,12 @@
 # UNO
 
-
-A command-line prototype of UNO with custom twists. This repository contains a playable version (v1) focused on core card mechanics, playable against a computer opponent. The project is under active development, with a clear roadmap toward a GUI and LAN multiplayer.
-
 ### Overview
 
 
-A lightweight UNO clone implemented in Java using Maven. Version 1 is a CLI prototype that supports:
+A lightweight UNO clone implemented in Java using Maven. Version 1 is a CLI that supports:
 - Basic card play (number cards and some action cards)
 - Playable against a computer opponent
 - Card drawing, turn order, and basic UNO rules
-
-Future plans include additional game modes, a graphical UI using LibGDX, and LAN-based local multiplayer.
 
 
 ### Features (Implemented)
